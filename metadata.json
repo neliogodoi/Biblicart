@@ -1,0 +1,5 @@
+{
+  "name": "BiblicArt",
+  "description": "BiblicArt is a Gartic-style drawing and guessing game with a biblical theme. Create or join a room with friends, draw the chosen word, and let others guess what it is. A fun and interactive game for groups.",
+  "requestFramePermissions": []
+}

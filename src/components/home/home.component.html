@@ -1,0 +1,66 @@
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4" style="background-color: #e0f7fa;">
+  <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div class="text-center">
+        <svg class="mx-auto h-16 w-auto" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 70C10 70 10 60 15 50C20 40 30 40 35 45C50 55 70 30 85 20" stroke="#3A86FF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M85 20C90 10 95 20 90 25C85 30 80 25 80 20" stroke="#FFBE0B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      <h1 class="text-4xl font-bold text-gray-800 mt-4">BiblicArt</h1>
+      <p class="text-gray-500 mt-2">O jogo de desenho e adivinhação bíblico!</p>
+    </div>
+    
+    <div class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Seu nome</label>
+        <input 
+          id="name" 
+          type="text" 
+          [ngModel]="playerName()"
+          (ngModelChange)="playerName.set($event)"
+          placeholder="Ex: João" 
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent"
+        />
+      </div>
+
+      @if (showJoinForm()) {
+        <div>
+          <label for="code" class="block text-sm font-medium text-gray-700">Código da Sala</label>
+          <input 
+            id="code" 
+            type="text" 
+            [ngModel]="roomCode()"
+            (ngModelChange)="roomCode.set($event.toUpperCase())"
+            placeholder="Ex: AB12"
+            maxlength="4"
+            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF006E] focus:border-transparent"
+          />
+        </div>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="flex justify-center items-center p-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-[#3A86FF]"></div>
+      </div>
+    } @else {
+      <div class="space-y-4">
+        @if (showJoinForm()) {
+          <button (click)="joinRoom()" [disabled]="!playerName() || !roomCode()" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-[#FF006E] hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF006E] disabled:bg-pink-300 disabled:cursor-not-allowed transition-colors duration-300">
+            Entrar
+          </button>
+          <button (click)="showJoinForm.set(false)" class="w-full text-center text-gray-600 hover:text-gray-800 font-medium">
+            Voltar
+          </button>
+        } @else {
+          <button (click)="createRoom()" [disabled]="!playerName()" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-[#3A86FF] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3A86FF] disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors duration-300">
+            Criar Sala
+          </button>
+          <button (click)="showJoinForm.set(true)" class="w-full flex justify-center py-3 px-4 border-2 border-[#2EC4B6] rounded-lg shadow-lg text-lg font-semibold text-[#2EC4B6] bg-white hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] transition-colors duration-300">
+            Entrar em uma Sala
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

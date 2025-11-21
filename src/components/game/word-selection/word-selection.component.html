@@ -1,0 +1,21 @@
+
+<div class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-20">
+  <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+    @if(selectedWord()) {
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Prepare-se para desenhar!</h2>
+      <p class="text-lg text-gray-600">Aguarde...</p>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-[#3A86FF] mx-auto mt-6"></div>
+    } @else {
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Escolha uma palavra para desenhar</h2>
+      <div class="flex flex-col md:flex-row gap-4 mt-6">
+        @for(word of words(); track word) {
+          <button 
+            (click)="chooseWord(word)" 
+            class="px-8 py-4 bg-[#FFBE0B] text-gray-900 font-bold text-xl rounded-lg shadow-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFBE0B] transition-transform transform hover:scale-105">
+            {{ word }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

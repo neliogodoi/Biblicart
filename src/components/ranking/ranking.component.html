@@ -1,0 +1,32 @@
+
+<div class="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50" style="background-color: #e0f7fa;">
+  <div class="w-full max-w-lg mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">Fim de Jogo!</h1>
+    <h2 class="text-2xl font-semibold text-[#3A86FF] mb-8">Ranking Final</h2>
+
+    <div class="space-y-3">
+      @for (player of sortedPlayers(); track player.id; let i = $index) {
+        <div class="flex items-center p-4 rounded-lg" 
+             [class.bg-yellow-300]="i === 0" 
+             [class.bg-gray-200]="i === 1" 
+             [class.bg-yellow-100]="i === 2"
+             [class.bg-gray-50]="i > 2">
+          <span class="text-2xl font-bold w-12">
+            @if (i === 0) { 🥇 }
+            @else if (i === 1) { 🥈 }
+            @else if (i === 2) { 🥉 }
+            @else { {{ i + 1 }}. }
+          </span>
+          <span class="text-lg font-semibold text-gray-800 text-left flex-grow">{{ player.name }}</span>
+          <span class="text-lg font-bold text-[#FF006E]">{{ player.score }} pts</span>
+        </div>
+      }
+    </div>
+
+    <div class="mt-10">
+      <button (click)="goToHome()" class="px-8 py-3 bg-[#2EC4B6] text-white font-bold text-lg rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] transition-transform transform hover:scale-105">
+        Jogar Novamente
+      </button>
+    </div>
+  </div>
+</div>
