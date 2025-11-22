@@ -11,14 +11,13 @@ export interface Room {
   currentDrawerId?: string;
   secretWord?: string;
   createdAt: Timestamp;
-  playerIds: string[];
+  players: Player[];
 }
 
 export interface Player {
   id: string;
   name: string;
   score: number;
-  isHost: boolean;
   joinedAt: Timestamp;
 }
 

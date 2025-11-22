@@ -3,7 +3,7 @@ import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, doc, onSnapshot, query, orderBy, Firestore } from 'firebase/firestore';
-import { Room, Player, Stroke, Guess, Round } from '../interfaces/game';
+import { Room, Stroke, Guess, Round } from '../interfaces/game';
 import { AuthService } from './auth.service';
 import { FIRESTORE } from '../firebase.providers';
 
@@ -15,7 +15,6 @@ export class GameService {
 
   // Raw state signals
   room = signal<Room | null>(null);
-  players = signal<Player[]>([]);
   strokes = signal<Stroke[]>([]);
   guesses = signal<Guess[]>([]);
   round = signal<Round | null>(null);
@@ -26,8 +25,16 @@ export class GameService {
 
   // Computed signals for derived state
   user = this.authService.user;
+  
+  /**
+   * Players list is now derived directly from the room object,
+   * making it the single source of truth and preventing desync issues.
+   */
+  players = computed(() => this.room()?.players || []);
+
   isHost = computed(() => this.user()?.uid === this.room()?.hostId);
   isDrawer = computed(() => this.user()?.uid === this.round()?.drawerId);
+  
   currentPlayer = computed(() => this.players().find(p => p.id === this.user()?.uid));
 
   constructor() {
@@ -68,17 +75,6 @@ export class GameService {
       }
     );
     this.unsubscribes.push(roomUnsub);
-
-    const playersQuery = query(collection(this.firestore, `rooms/${roomId}/players`), orderBy('joinedAt'));
-    const playersUnsub = onSnapshot(playersQuery, 
-      (querySnap) => {
-        this.players.set(querySnap.docs.map(d => ({ id: d.id, ...d.data() } as Player)));
-      },
-      (error) => {
-        console.error("Erro ao escutar a coleção de jogadores:", error);
-      }
-    );
-    this.unsubscribes.push(playersUnsub);
 
     const strokesQuery = query(collection(this.firestore, `rooms/${roomId}/strokes`), orderBy('createdAt'));
     const strokesUnsub = onSnapshot(strokesQuery, 
@@ -137,7 +133,6 @@ export class GameService {
         this.roundUnsubscribe = null;
     }
     this.room.set(null);
-    this.players.set([]);
     this.strokes.set([]);
     this.guesses.set([]);
     this.round.set(null);

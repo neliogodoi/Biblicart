@@ -15,9 +15,10 @@ export class LobbyComponent {
 
   async startGame(): Promise<void> {
     const room = this.gameService.room();
-    if (room && this.gameService.isHost() && (room.playerIds?.length || 0) > 1) {
+    const players = this.gameService.players();
+    if (room && this.gameService.isHost() && players.length > 1) {
       try {
-        await this.firebaseService.startGame(room.id);
+        await this.firebaseService.startGame(room.id, players);
       } catch (error: any) {
         console.error("Failed to start game:", error);
         alert(`Ocorreu um erro ao iniciar o jogo: ${error.message}`);

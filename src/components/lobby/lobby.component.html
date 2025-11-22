@@ -12,13 +12,13 @@
         </div>
       </div>
 
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Jogadores ({{ room.playerIds?.length || 0 }})</h2>
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Jogadores ({{ gameService.players().length }})</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         @for (player of gameService.players(); track player.id) {
-          <div class="bg-white p-4 rounded-lg border-2 flex flex-col items-center justify-center text-center shadow-sm" [class.border-[#FFBE0B]]="player.isHost">
+          <div class="bg-white p-4 rounded-lg border-2 flex flex-col items-center justify-center text-center shadow-sm" [class.border-[#FFBE0B]]="player.id === room.hostId">
             <span class="text-3xl">👤</span>
             <p class="font-semibold text-gray-800 truncate w-full">{{ player.name }}</p>
-            @if(player.isHost) {
+            @if(player.id === room.hostId) {
               <p class="text-xs text-[#FFBE0B] font-bold">HOST</p>
             }
           </div>
@@ -27,10 +27,10 @@
       
       @if (gameService.isHost()) {
         <div class="mt-8 text-center">
-            <button (click)="startGame()" [disabled]="(gameService.room()?.playerIds?.length || 0) < 2" class="px-8 py-4 bg-[#2EC4B6] text-white font-bold text-xl rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] disabled:bg-gray-400 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+            <button (click)="startGame()" [disabled]="gameService.players().length < 2" class="px-8 py-4 bg-[#2EC4B6] text-white font-bold text-xl rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] disabled:bg-gray-400 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
                 Iniciar Partida
             </button>
-            @if((gameService.room()?.playerIds?.length || 0) < 2) {
+            @if(gameService.players().length < 2) {
                 <p class="text-sm text-red-500 mt-2">É necessário pelo menos 2 jogadores para começar.</p>
             }
         </div>
