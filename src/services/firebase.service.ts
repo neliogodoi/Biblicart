@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   collection, addDoc, query, where, getDocs, doc, setDoc,
-  writeBatch, updateDoc, increment, runTransaction, Firestore, getDoc, arrayUnion
+  writeBatch, updateDoc, increment, runTransaction, Firestore, getDoc, arrayUnion, Timestamp
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
 import { Stroke, Guess, Player, Room } from '../interfaces/game';
@@ -65,38 +65,44 @@ export class FirebaseService {
   async joinRoom(roomCode: string, playerName: string): Promise<string | null> {
     const user = await this.authService.signIn();
 
+    // 1. Encontrar a sala pelo código
     const roomsRef = collection(this.firestore, 'rooms');
     const q = query(roomsRef, where('code', '==', roomCode.toUpperCase()), where('status', '==', 'waiting'));
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
-      alert('Room not found or game has already started.');
+      alert('Sala não encontrada ou jogo já iniciado.');
       return null;
     }
 
-    const roomDoc = snapshot.docs[0];
-    const roomRef = roomDoc.ref;
-    const roomData = roomDoc.data() as Room;
+    const roomDocInitial = snapshot.docs[0];
+    const roomRef = roomDocInitial.ref;
+    const roomData = roomDocInitial.data() as Room;
 
-    // Prevent joining if already in the room
+    // 2. Verificação rápida de duplicata no cliente (opcional, para UX)
     if (roomData.players && roomData.players.some(p => p.id === user.uid)) {
-        return roomDoc.id; // Already in room, just return the ID.
+        // Usuário já está na lista, apenas retorna o ID para entrar
+        return roomDocInitial.id;
     }
-    
-    const newPlayer: Player = {
-        id: user.uid,
-        name: playerName,
-        score: 0,
-        joinedAt: Date.now(),
-    };
 
     try {
+        const newPlayer: Player = {
+            id: user.uid,
+            name: playerName,
+            score: 0,
+            joinedAt: Date.now(),
+        };
+
+        // 3. ESCRITA ATÔMICA COM ARRAY UNION
+        // Isso diz ao servidor: "Adicione este objeto à lista. Se alguém acabou de adicionar outro, não tem problema, adicione este também."
+        // Não lê, não sobrescreve a lista inteira. Apenas anexa.
         await updateDoc(roomRef, {
             players: arrayUnion(newPlayer)
         });
-        return roomDoc.id;
+        
+        return roomDocInitial.id;
     } catch (error) {
-        console.error("Failed to join room: ", error);
+        console.error("Falha ao entrar na sala: ", error);
         alert("Falha ao entrar na sala. Tente novamente.");
         return null;
     }

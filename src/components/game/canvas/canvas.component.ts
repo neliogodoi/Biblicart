@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, AfterViewInit, inject, effect, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, AfterViewInit, inject, effect, OnDestroy, signal, computed } from '@angular/core';
 import { GameService } from '../../../services/game.service';
 import { FirebaseService } from '../../../services/firebase.service';
 import { Stroke } from '../../../interfaces/game';
@@ -26,6 +26,11 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
 
   selectedColor = signal(this.availableColors[0]);
   selectedThickness = signal(this.availableThicknesses[1]);
+
+  // Computed signal to strictly control toolbar visibility
+  showToolbar = computed(() => {
+    return this.gameService.isDrawer() && this.gameService.room()?.status === 'playing';
+  });
 
   private resizeObserver: ResizeObserver;
   

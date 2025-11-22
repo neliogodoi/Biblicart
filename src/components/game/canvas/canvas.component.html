@@ -1,8 +1,9 @@
+
 <div class="w-full h-full relative group">
   <canvas #canvas class="w-full h-full touch-none cursor-crosshair"></canvas>
   
-  @if (gameService.isDrawer()) {
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-2xl border border-gray-100 p-2 rounded-2xl flex items-center gap-3 z-50 transition-opacity duration-300 opacity-90 hover:opacity-100">
+  @if (showToolbar()) {
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-2xl border border-gray-100 p-2 rounded-2xl flex items-center gap-3 z-10 transition-opacity duration-300 opacity-90 hover:opacity-100">
         <!-- Colors -->
         <div class="flex items-center gap-2">
             @for(color of availableColors; track color) {

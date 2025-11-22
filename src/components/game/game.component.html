@@ -1,3 +1,4 @@
+
 <div class="relative h-screen w-screen">
   <!-- Main Layout -->
   <div class="flex flex-col lg:flex-row h-full w-full bg-gray-100 p-1 lg:p-2 gap-2">
@@ -64,7 +65,11 @@
   </div>
 
   <!-- Word Selection Overlay -->
-  @if(gameService.room()?.status === 'word-selection' && gameService.isDrawer()) {
+  <!-- Added explicit check: gameService.round()?.id === gameService.room()?.currentRound.toString() -->
+  <!-- This prevents the overlay from showing if the local round data hasn't synced with the room's new round number yet -->
+  @if(gameService.room()?.status === 'word-selection' && 
+      gameService.isDrawer() && 
+      gameService.round()?.id === gameService.room()?.currentRound?.toString()) {
     <app-word-selection />
   }
 </div>
