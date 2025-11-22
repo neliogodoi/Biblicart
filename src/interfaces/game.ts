@@ -1,6 +1,4 @@
 
-import { Timestamp } from 'firebase/firestore';
-
 export interface Room {
   id: string;
   code: string;
@@ -10,7 +8,7 @@ export interface Room {
   maxRounds: number;
   currentDrawerId?: string;
   secretWord?: string;
-  createdAt: Timestamp;
+  createdAt: number;
   players: Player[];
 }
 
@@ -18,7 +16,7 @@ export interface Player {
   id: string;
   name: string;
   score: number;
-  joinedAt: Timestamp;
+  joinedAt: number;
 }
 
 export interface Stroke {
@@ -26,6 +24,7 @@ export interface Stroke {
   points: { x: number; y: number }[];
   color: string;
   thickness: number;
+  createdAt?: number;
 }
 
 export interface Guess {
@@ -34,13 +33,13 @@ export interface Guess {
   playerName: string;
   text: string;
   isCorrect: boolean;
-  createdAt: Timestamp;
+  createdAt: number;
 }
 
 export interface Round {
     id: string; // e.g., '1', '2'
     drawerId: string;
     secretWord: string;
-    startedAt: Timestamp;
-    endsAt?: Timestamp;
+    startedAt: number;
+    endsAt?: number;
 }

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   collection, addDoc, query, where, getDocs, doc, setDoc,
-  serverTimestamp, writeBatch, updateDoc, increment, runTransaction, Firestore, getDoc, Timestamp, arrayUnion
+  writeBatch, updateDoc, increment, runTransaction, Firestore, getDoc, arrayUnion
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
 import { Stroke, Guess, Player, Room } from '../interfaces/game';
@@ -44,7 +44,7 @@ export class FirebaseService {
         id: user.uid,
         name: playerName,
         score: 0,
-        joinedAt: Timestamp.now(),
+        joinedAt: Date.now(),
     };
 
     const newRoom: Omit<Room, 'id'> = {
@@ -53,7 +53,7 @@ export class FirebaseService {
       status: 'waiting',
       currentRound: 0,
       maxRounds: 5,
-      createdAt: serverTimestamp() as any,
+      createdAt: Date.now(),
       players: [hostPlayer],
     };
 
@@ -87,7 +87,7 @@ export class FirebaseService {
         id: user.uid,
         name: playerName,
         score: 0,
-        joinedAt: Timestamp.now(),
+        joinedAt: Date.now(),
     };
 
     try {
@@ -106,37 +106,43 @@ export class FirebaseService {
     if (!this.firestore) return;
     if (players.length < 2) return;
 
+    const batch = writeBatch(this.firestore);
     const roomRef = doc(this.firestore, `rooms/${roomId}`);
     
-    await updateDoc(roomRef, {
+    batch.update(roomRef, {
         status: 'word-selection',
         currentRound: 1,
     });
     
     const firstDrawerId = players[0].id;
     const roundRef = doc(this.firestore, `rooms/${roomId}/rounds/1`);
-    await setDoc(roundRef, {
+    batch.set(roundRef, {
         drawerId: firstDrawerId,
         secretWord: '',
-        startedAt: serverTimestamp()
+        startedAt: Date.now()
     });
+
+    await batch.commit();
   }
   
   async chooseWord(roomId: string, round: number, word: string) {
     if (!this.firestore) return;
 
+    const batch = writeBatch(this.firestore);
     const roundRef = doc(this.firestore, `rooms/${roomId}/rounds/${round}`);
-    await updateDoc(roundRef, { secretWord: word });
+    batch.update(roundRef, { secretWord: word });
 
     const roomRef = doc(this.firestore, `rooms/${roomId}`);
-    await updateDoc(roomRef, { status: 'playing' });
+    batch.update(roomRef, { status: 'playing' });
+
+    await batch.commit();
   }
 
   async addStroke(roomId: string, stroke: Stroke) {
     if (!this.firestore) return;
     await addDoc(collection(this.firestore, `rooms/${roomId}/strokes`), {
         ...stroke,
-        createdAt: serverTimestamp()
+        createdAt: Date.now()
     });
   }
 
@@ -169,7 +175,7 @@ export class FirebaseService {
           playerName: guess.playerName,
           text: guess.text,
           isCorrect,
-          createdAt: serverTimestamp() as any
+          createdAt: Date.now()
       };
 
       await addDoc(collection(this.firestore, `rooms/${roomId}/guesses`), guessPayload);
@@ -215,7 +221,7 @@ export class FirebaseService {
                   transaction.set(nextRoundRef, {
                     drawerId: nextDrawerId,
                     secretWord: '',
-                    startedAt: serverTimestamp()
+                    startedAt: Date.now()
                   });
                   
                   transaction.update(roomRef, {
