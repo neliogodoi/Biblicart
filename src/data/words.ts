@@ -1,6 +1,5 @@
-
 export const biblicalWords = [
-  "Arca de Noé", "Adão", "Eva", "S serpente", "Jardim do Éden", "Maná",
+  "Arca de Noé", "Adão", "Eva", "Serpente", "Jardim do Éden", "Maná",
   "Mar Vermelho", "Moisés", "Davi", "Golias", "Sansão", "Daniel",
   "Leões", "Jonas", "Baleia", "Jesus", "Manjedoura", "Cruz",
   "Ressurreição", "Apóstolos", "Pão", "Peixe", "Vinho", "Água",

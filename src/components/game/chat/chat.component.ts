@@ -42,7 +42,7 @@ export class ChatComponent {
         text: text,
         secretWord: round.secretWord,
         playerId: player.id,
-        playerName: player.name
+        playerName: player.name,
     });
     this.guessText.set('');
   }

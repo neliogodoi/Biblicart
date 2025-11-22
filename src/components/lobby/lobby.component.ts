@@ -1,4 +1,3 @@
-
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { GameService } from '../../services/game.service';
 import { FirebaseService } from '../../services/firebase.service';
@@ -14,11 +13,15 @@ export class LobbyComponent {
   gameService = inject(GameService);
   firebaseService = inject(FirebaseService);
 
-  startGame(): void {
+  async startGame(): Promise<void> {
     const room = this.gameService.room();
-    const players = this.gameService.players();
-    if (room && this.gameService.isHost() && players.length > 1) {
-      this.firebaseService.startGame(room.id, players);
+    if (room && this.gameService.isHost() && (room.playerIds?.length || 0) > 1) {
+      try {
+        await this.firebaseService.startGame(room.id);
+      } catch (error: any) {
+        console.error("Failed to start game:", error);
+        alert(`Ocorreu um erro ao iniciar o jogo: ${error.message}`);
+      }
     }
   }
 

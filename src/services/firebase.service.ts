@@ -1,11 +1,10 @@
-
 import { Injectable, inject } from '@angular/core';
 import {
   collection, addDoc, query, where, getDocs, doc, setDoc,
-  serverTimestamp, writeBatch, updateDoc, increment, runTransaction, Firestore
+  serverTimestamp, writeBatch, updateDoc, increment, runTransaction, Firestore, getDoc, arrayUnion
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
-import { Stroke, Guess } from '../interfaces/game';
+import { Stroke, Guess, Player } from '../interfaces/game';
 import { biblicalWords } from '../data/words';
 import { FIRESTORE } from '../firebase.providers';
 
@@ -47,6 +46,7 @@ export class FirebaseService {
       currentRound: 0,
       maxRounds: 5,
       createdAt: serverTimestamp(),
+      playerIds: [user.uid],
     });
 
     const playerRef = doc(this.firestore, `rooms/${newRoomRef.id}/players/${user.uid}`);
@@ -73,6 +73,13 @@ export class FirebaseService {
     }
 
     const roomDoc = snapshot.docs[0];
+    
+    // Atomically add the new player's UID to the playerIds array.
+    // This prevents race conditions if multiple players join at the same time.
+    await updateDoc(roomDoc.ref, { 
+      playerIds: arrayUnion(user.uid) 
+    });
+
     const playerRef = doc(this.firestore, `rooms/${roomDoc.id}/players/${user.uid}`);
     await setDoc(playerRef, {
       name: playerName,
@@ -84,19 +91,25 @@ export class FirebaseService {
     return roomDoc.id;
   }
 
-  async startGame(roomId: string, players: {id: string, name: string}[]) {
+  async startGame(roomId: string) {
     if (!this.firestore) return;
 
     const roomRef = doc(this.firestore, `rooms/${roomId}`);
+    const roomDoc = await getDoc(roomRef);
+    if (!roomDoc.exists()) throw new Error("Room doesn't exist");
+    
+    const playerIds = roomDoc.data().playerIds || [];
+    if (playerIds.length < 2) return; 
+
     await updateDoc(roomRef, {
         status: 'word-selection',
         currentRound: 1,
     });
     
-    const firstDrawer = players[0];
+    const firstDrawerId = playerIds[0];
     const roundRef = doc(this.firestore, `rooms/${roomId}/rounds/1`);
     await setDoc(roundRef, {
-        drawerId: firstDrawer.id,
+        drawerId: firstDrawerId,
         secretWord: '',
         startedAt: serverTimestamp()
     });
@@ -130,10 +143,19 @@ export class FirebaseService {
     await batch.commit();
   }
 
+  private normalizeString(str: string): string {
+    if (!str) return '';
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase();
+  }
+
   async submitGuess(roomId: string, guess: { text: string; secretWord: string; playerId: string; playerName: string; }) {
       if (!this.firestore) return;
 
-      const isCorrect = guess.text.trim().toLowerCase() === guess.secretWord.toLowerCase();
+      const isCorrect = this.normalizeString(guess.text) === this.normalizeString(guess.secretWord);
       
       const guessPayload: Omit<Guess, 'id'> = {
           playerId: guess.playerId,
@@ -152,13 +174,16 @@ export class FirebaseService {
               if (!roomDoc.exists()) throw new Error("Room does not exist!");
 
               const roomData = roomDoc.data();
+              const playerIds = roomData.playerIds as string[] || [];
               const currentRound = roomData.currentRound;
               const maxRounds = roomData.maxRounds;
 
               const guesserRef = doc(this.firestore, `rooms/${roomId}/players/${guess.playerId}`);
-              const drawerRef = doc(this.firestore, `rooms/${roomId}/rounds/${currentRound}`);
-              const drawerDoc = await transaction.get(drawerRef);
-              const drawerId = drawerDoc.data()?.drawerId;
+              const currentRoundRef = doc(this.firestore, `rooms/${roomId}/rounds/${currentRound}`);
+              const currentRoundDoc = await transaction.get(currentRoundRef);
+              if (!currentRoundDoc.exists()) throw new Error(`Round ${currentRound} doesn't exist`);
+
+              const drawerId = currentRoundDoc.data().drawerId;
               const drawerPlayerRef = doc(this.firestore, `rooms/${roomId}/players/${drawerId}`);
 
               transaction.update(guesserRef, { score: increment(10) });
@@ -172,16 +197,14 @@ export class FirebaseService {
                       status: 'word-selection',
                       currentRound: nextRound,
                   });
-
-                  const playersQuery = query(collection(this.firestore, `rooms/${roomId}/players`));
-                  const playersSnapshot = await getDocs(playersQuery);
-                  const players = playersSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                  const nextDrawerIndex = currentRound % players.length;
-                  const nextDrawer = players[nextDrawerIndex];
+                  
+                  const currentDrawerIndex = playerIds.indexOf(drawerId);
+                  const nextDrawerIndex = (currentDrawerIndex === -1 ? 0 : currentDrawerIndex + 1) % playerIds.length;
+                  const nextDrawerId = playerIds[nextDrawerIndex];
                   
                   const nextRoundRef = doc(this.firestore, `rooms/${roomId}/rounds/${nextRound}`);
                   transaction.set(nextRoundRef, {
-                    drawerId: nextDrawer.id,
+                    drawerId: nextDrawerId,
                     secretWord: '',
                     startedAt: serverTimestamp()
                   });

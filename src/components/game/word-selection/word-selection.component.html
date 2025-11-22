@@ -1,4 +1,3 @@
-
 <div class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-20">
   <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
     @if(selectedWord()) {
@@ -12,7 +11,7 @@
           <button 
             (click)="chooseWord(word)" 
             class="px-8 py-4 bg-[#FFBE0B] text-gray-900 font-bold text-xl rounded-lg shadow-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFBE0B] transition-transform transform hover:scale-105">
-            {{ word }}
+            {{ word.toUpperCase() }}
           </button>
         }
       </div>

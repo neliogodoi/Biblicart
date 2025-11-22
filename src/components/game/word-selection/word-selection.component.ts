@@ -20,6 +20,11 @@ export class WordSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.words.set(this.firebaseService.getWordsToChoose());
+    // Clear the canvas for the new round when this component loads for the new drawer
+    const room = this.gameService.room();
+    if (room) {
+      this.firebaseService.clearCanvas(room.id);
+    }
   }
 
   chooseWord(word: string): void {

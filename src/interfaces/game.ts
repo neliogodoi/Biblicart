@@ -11,6 +11,7 @@ export interface Room {
   currentDrawerId?: string;
   secretWord?: string;
   createdAt: Timestamp;
+  playerIds: string[];
 }
 
 export interface Player {

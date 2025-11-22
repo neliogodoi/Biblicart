@@ -22,6 +22,7 @@ export class GameService {
 
   // Subscriptions
   private unsubscribes: Unsubscribe[] = [];
+  private roundUnsubscribe: Unsubscribe | null = null;
 
   // Computed signals for derived state
   user = this.authService.user;
@@ -103,9 +104,14 @@ export class GameService {
   }
 
   listenToRound(roomId: string, roundNumber: number): void {
+    if (this.roundUnsubscribe) {
+        this.roundUnsubscribe();
+        this.roundUnsubscribe = null;
+    }
+
      if (roundNumber > 0 && this.firestore) {
         const roundRef = doc(this.firestore, `rooms/${roomId}/rounds/${roundNumber}`);
-        const roundUnsub = onSnapshot(roundRef, 
+        this.roundUnsubscribe = onSnapshot(roundRef, 
           (docSnap) => {
             if (docSnap.exists()) {
                 this.round.set({ id: docSnap.id, ...docSnap.data() } as Round);
@@ -118,7 +124,6 @@ export class GameService {
             this.round.set(null);
           }
         );
-        this.unsubscribes.push(roundUnsub);
      } else {
         this.round.set(null);
      }
@@ -127,6 +132,10 @@ export class GameService {
   cleanup(): void {
     this.unsubscribes.forEach(unsub => unsub());
     this.unsubscribes = [];
+    if (this.roundUnsubscribe) {
+        this.roundUnsubscribe();
+        this.roundUnsubscribe = null;
+    }
     this.room.set(null);
     this.players.set([]);
     this.strokes.set([]);

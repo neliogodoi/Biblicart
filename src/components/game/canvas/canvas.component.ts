@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, AfterViewInit, inject, effect, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, AfterViewInit, inject, effect, OnDestroy, signal } from '@angular/core';
 import { GameService } from '../../../services/game.service';
 import { FirebaseService } from '../../../services/firebase.service';
 import { Stroke } from '../../../interfaces/game';
@@ -21,8 +21,11 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   private isDrawing = false;
   private currentStroke: { x: number; y: number }[] = [];
   
-  private color = '#000000';
-  private thickness = 5;
+  availableColors = ['#000000', '#EF4444', '#3B82F6', '#22C55E', '#EAB308', '#A16207'];
+  availableThicknesses = [2, 5, 10];
+
+  selectedColor = signal(this.availableColors[0]);
+  selectedThickness = signal(this.availableThicknesses[1]);
 
   private resizeObserver: ResizeObserver;
   
@@ -94,8 +97,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     this.currentStroke.push({ x, y });
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineWidth = this.thickness;
-    this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = this.selectedThickness();
+    this.ctx.strokeStyle = this.selectedColor();
   }
 
   draw(event: MouseEvent | TouchEvent): void {
@@ -115,8 +118,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     if (this.currentStroke.length > 1) {
       const stroke: Stroke = {
         points: this.currentStroke,
-        color: this.color,
-        thickness: this.thickness,
+        color: this.selectedColor(),
+        thickness: this.selectedThickness(),
       };
       this.firebaseService.addStroke(this.gameService.room()!.id, stroke);
     }

@@ -1,4 +1,3 @@
-
 <div class="h-full flex flex-col p-4">
   <h3 class="font-bold text-lg mb-2 flex-shrink-0 text-gray-700">Palpites</h3>
   <div #scrollContainer class="flex-grow overflow-y-auto space-y-3 pr-2 chat-messages">
@@ -9,9 +8,9 @@
             <span class="font-bold">{{ guess.playerName }}</span> acertou a palavra!
           </p>
         } @else {
-          <p>
-            <span class="font-semibold" [class.text-blue-600]="guess.playerId === gameService.user()?.uid">{{ guess.playerName }}:</span>
-            <span class="text-gray-700">{{ guess.text }}</span>
+          <p class="text-gray-800">
+            <span class="font-bold" [class.text-blue-600]="guess.playerId === gameService.user()?.uid">{{ guess.playerName }}:</span>
+            <span class="ml-1 text-gray-700">{{ guess.text }}</span>
           </p>
         }
       </div>
