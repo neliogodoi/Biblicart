@@ -3,49 +3,51 @@
   <canvas #canvas class="w-full h-full touch-none cursor-crosshair"></canvas>
   
   @if (showToolbar()) {
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-2xl border border-gray-100 p-2 rounded-2xl flex items-center gap-3 z-10 transition-opacity duration-300 opacity-90 hover:opacity-100">
+    <!-- Reduced padding, gap, and bottom spacing for a more compact toolbar -->
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white shadow-xl border border-gray-200 p-1.5 rounded-full flex items-center gap-2 z-[1]">
         <!-- Colors -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5">
             @for(color of availableColors; track color) {
                 <button 
                     (click)="selectedColor.set(color)"
                     [style.background-color]="color"
-                    class="w-8 h-8 rounded-full border-2 transition-transform transform hover:scale-110 focus:outline-none shadow-sm"
+                    class="w-6 h-6 rounded-full border border-gray-200 transition-transform transform hover:scale-110 focus:outline-none shadow-sm"
                     [class.ring-2]="selectedColor() === color"
-                    [class.ring-offset-2]="selectedColor() === color"
+                    [class.ring-offset-1]="selectedColor() === color"
                     [class.ring-blue-500]="selectedColor() === color"
-                    [class.border-white]="selectedColor() !== color"
                     [title]="color">
                 </button>
             }
         </div>
 
         <!-- Separator -->
-        <div class="w-px h-8 bg-gray-200"></div>
+        <div class="w-px h-6 bg-gray-200"></div>
 
         <!-- Thicknesses -->
-        <div class="flex items-center gap-2 items-end">
+        <div class="flex items-center gap-1.5">
             @for(thickness of availableThicknesses; track thickness) {
                 <button 
                     (click)="selectedThickness.set(thickness)"
-                    class="p-2 rounded-lg flex items-center justify-center transition-colors focus:outline-none hover:bg-gray-100"
-                    [class.bg-blue-50]="selectedThickness() === thickness"
-                    [class.text-blue-600]="selectedThickness() === thickness">
+                    class="w-6 h-6 rounded-full flex items-center justify-center transition-colors focus:outline-none hover:bg-gray-100"
+                    [class.bg-blue-50]="selectedThickness() === thickness">
                     <div 
-                        class="rounded-full bg-current"
-                        [style.width.px]="thickness"
-                        [style.height.px]="thickness">
+                        class="rounded-full transition-colors"
+                        [class.bg-blue-600]="selectedThickness() === thickness"
+                        [class.bg-gray-400]="selectedThickness() !== thickness"
+                        [style.width.px]="thickness > 6 ? 8 : thickness" 
+                        [style.height.px]="thickness > 6 ? 8 : thickness">
+                        <!-- Scaled down visual representation for the button, actual drawing thickness remains correct -->
                     </div>
                 </button>
             }
         </div>
 
         <!-- Separator -->
-        <div class="w-px h-8 bg-gray-200"></div>
+        <div class="w-px h-6 bg-gray-200"></div>
 
         <!-- Clear Button -->
-        <button (click)="clearCanvas()" title="Limpar Tela" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all focus:outline-none shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button (click)="clearCanvas()" title="Limpar Tela" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all focus:outline-none shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
         </button>

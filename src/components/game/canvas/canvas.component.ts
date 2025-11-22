@@ -9,6 +9,7 @@ import { Stroke } from '../../../interfaces/game';
   standalone: true,
   imports: [],
   templateUrl: './canvas.component.html',
+  styles: [':host { display: block; width: 100%; height: 100%; }'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasComponent implements AfterViewInit, OnDestroy {
@@ -58,8 +59,9 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   setCanvasSize(): void {
     const canvas = this.canvasRef.nativeElement;
     const parent = canvas.parentElement!;
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight;
+    // Ensure dimensions are valid
+    canvas.width = parent.clientWidth || 300;
+    canvas.height = parent.clientHeight || 300;
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
     this.drawAllStrokes(this.gameService.strokes());
@@ -99,7 +101,11 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     event.preventDefault();
     this.isDrawing = true;
     const { x, y } = this.getCoords(event);
+    
+    // Store absolute pixel coordinates
     this.currentStroke.push({ x, y });
+    
+    // Draw visually using pixels for immediate feedback
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
     this.ctx.lineWidth = this.selectedThickness();
@@ -110,7 +116,11 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     if (!this.isDrawing || !this.gameService.isDrawer()) return;
     event.preventDefault();
     const { x, y } = this.getCoords(event);
+    
+    // Store absolute pixel coordinates
     this.currentStroke.push({ x, y });
+
+    // Draw visually using pixels
     this.ctx.lineTo(x, y);
     this.ctx.stroke();
   }
@@ -138,13 +148,21 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
 
   private drawAllStrokes(strokes: Stroke[]): void {
     if (!this.ctx) return;
-    this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+    const width = this.canvasRef.nativeElement.width;
+    const height = this.canvasRef.nativeElement.height;
+
+    this.ctx.clearRect(0, 0, width, height);
+    
     strokes.forEach(stroke => {
       if(stroke.points.length < 2) return;
+      
       this.ctx.beginPath();
-      this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
       this.ctx.lineWidth = stroke.thickness;
       this.ctx.strokeStyle = stroke.color;
+      
+      // Use raw pixel coordinates directly
+      this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      
       for (let i = 1; i < stroke.points.length; i++) {
         this.ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
       }

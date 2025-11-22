@@ -1,13 +1,21 @@
 
 <div class="relative h-screen w-screen">
   <!-- Main Layout -->
-  <div class="flex flex-col lg:flex-row h-full w-full bg-gray-100 p-1 lg:p-2 gap-2">
-    <!-- Main Game Area (Canvas and Word) -->
-    <div class="flex-1 lg:flex-auto flex flex-col bg-white rounded-xl shadow-lg overflow-hidden min-h-0">
-      <!-- Header -->
-      <div class="p-2 bg-white border-b flex justify-between items-center z-10 flex-shrink-0 min-h-[50px]">
-        <!-- Left side spacer to balance the flex layout -->
-        <div class="w-16"></div>
+  <div class="flex flex-col lg:flex-row h-full w-full bg-gray-100 p-2 gap-2">
+    
+    <!-- Main Game Area (Header + Canvas) -->
+    <!-- Uses flex-col to stack header and canvas with a gap -->
+    <div class="flex-1 lg:flex-auto flex flex-col gap-2 min-h-0">
+      
+      <!-- Header (Disconnected from Canvas) -->
+      <div class="p-2 bg-white rounded-xl shadow-sm flex justify-between items-center z-10 flex-shrink-0 min-h-[50px]">
+        <!-- Left: Round Info -->
+        <div class="w-20 text-left">
+          <span class="text-xs text-gray-400 block mb-0.5">Rodada</span>
+          <span class="font-bold text-lg text-gray-700 leading-none">
+            {{ gameService.room()?.currentRound }}/{{ gameService.room()?.maxRounds }}
+          </span>
+        </div>
 
         <!-- Center: Secret Word -->
         @if(gameService.isDrawer()) {
@@ -23,22 +31,23 @@
         }
 
         <!-- Right: Score -->
-        <div class="text-right w-16">
+        <div class="text-right w-20">
           <span class="text-xs text-gray-400 block mb-0.5">Pontos</span>
           <span class="font-bold text-lg text-gray-800 leading-none">{{ gameService.currentPlayer()?.score }}</span>
         </div>
       </div>
       
-      <!-- Canvas -->
-      <div class="flex-grow relative bg-white">
+      <!-- Canvas (Now in its own card) -->
+      <div class="flex-grow relative bg-white rounded-xl shadow-sm overflow-hidden">
           <app-canvas />
       </div>
     </div>
 
     <!-- Sidebar (Players and Chat) -->
+    <!-- Visible for everyone to ensure consistent canvas aspect ratio -->
     <div class="w-full lg:w-80 flex-1 lg:flex-none flex flex-col gap-2 min-h-0">
       <!-- Player List -->
-      <div class="bg-white rounded-xl shadow-lg p-3 flex-shrink-0">
+      <div class="bg-white rounded-xl shadow-sm p-3 flex-shrink-0">
         <div class="flex justify-between items-center cursor-pointer" (click)="isPlayerListExpanded.set(!isPlayerListExpanded())">
           <h3 class="font-bold text-md text-gray-700">Jogadores</h3>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transition-transform duration-300" [class.rotate-180]="!isPlayerListExpanded()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,15 +67,13 @@
       </div>
       
       <!-- Chat / Guesses -->
-      <div class="bg-white rounded-xl shadow-lg flex-grow flex flex-col min-h-0">
-        <app-chat />
+      <div class="bg-white rounded-xl shadow-sm flex-grow flex flex-col min-h-0 overflow-hidden">
+        <app-chat class="h-full w-full block" />
       </div>
     </div>
   </div>
 
   <!-- Word Selection Overlay -->
-  <!-- Added explicit check: gameService.round()?.id === gameService.room()?.currentRound.toString() -->
-  <!-- This prevents the overlay from showing if the local round data hasn't synced with the room's new round number yet -->
   @if(gameService.room()?.status === 'word-selection' && 
       gameService.isDrawer() && 
       gameService.round()?.id === gameService.room()?.currentRound?.toString()) {

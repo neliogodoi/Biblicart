@@ -1,3 +1,4 @@
+
 import { Injectable, inject } from '@angular/core';
 import {
   collection, addDoc, query, where, getDocs, doc, setDoc,
@@ -78,11 +79,11 @@ export class FirebaseService {
     const roomDocInitial = snapshot.docs[0];
     const roomRef = roomDocInitial.ref;
     const roomData = roomDocInitial.data() as Room;
+    const players = roomData.players || [];
 
-    // 2. Verificação rápida de duplicata no cliente (opcional, para UX)
-    if (roomData.players && roomData.players.some(p => p.id === user.uid)) {
-        // Usuário já está na lista, apenas retorna o ID para entrar
-        return roomDocInitial.id;
+    // Verifica se o usuário já está na sala
+    if (players.some(p => p.id === user.uid)) {
+        return roomDocInitial.id; // Já está na sala
     }
 
     try {
@@ -93,9 +94,7 @@ export class FirebaseService {
             joinedAt: Date.now(),
         };
 
-        // 3. ESCRITA ATÔMICA COM ARRAY UNION
-        // Isso diz ao servidor: "Adicione este objeto à lista. Se alguém acabou de adicionar outro, não tem problema, adicione este também."
-        // Não lê, não sobrescreve a lista inteira. Apenas anexa.
+        // USAR arrayUnion PARA ADICIONAR ATOMICAMENTE
         await updateDoc(roomRef, {
             players: arrayUnion(newPlayer)
         });
