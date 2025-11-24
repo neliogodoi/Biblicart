@@ -143,6 +143,55 @@ export class FirebaseService {
     await batch.commit();
   }
 
+  /**
+   * Advances the game when the drawer fails to pick a word in time.
+   */
+  async skipWordSelection(roomId: string) {
+    if (!this.firestore) return;
+
+    await runTransaction(this.firestore, async (transaction) => {
+      const roomRef = doc(this.firestore, `rooms/${roomId}`);
+      const roomDoc = await transaction.get(roomRef);
+      if (!roomDoc.exists()) throw new Error("Room does not exist!");
+
+      const roomData = roomDoc.data() as Room;
+      const players = [...roomData.players];
+      if (players.length === 0) throw new Error("No players in room");
+
+      const currentRound = roomData.currentRound;
+      const maxRounds = roomData.maxRounds;
+
+      const currentRoundRef = doc(this.firestore, `rooms/${roomId}/rounds/${currentRound}`);
+      const currentRoundDoc = await transaction.get(currentRoundRef);
+      const currentDrawerId = currentRoundDoc.exists()
+        ? currentRoundDoc.data().drawerId
+        : players[0].id;
+
+      if (currentRound >= maxRounds) {
+        transaction.update(roomRef, { players, status: 'ended' });
+        return;
+      }
+
+      const nextRound = currentRound + 1;
+      const currentDrawerIndex = players.findIndex(p => p.id === currentDrawerId);
+      const nextDrawerIndex = (currentDrawerIndex + 1) % players.length;
+      const nextDrawerId = players[nextDrawerIndex].id;
+
+      const nextRoundRef = doc(this.firestore, `rooms/${roomId}/rounds/${nextRound}`);
+      transaction.set(nextRoundRef, {
+        drawerId: nextDrawerId,
+        secretWord: '',
+        startedAt: Date.now()
+      });
+
+      transaction.update(roomRef, {
+        players,
+        status: 'word-selection',
+        currentRound: nextRound,
+      });
+    });
+  }
+
   async addStroke(roomId: string, stroke: Stroke) {
     if (!this.firestore) return;
     await addDoc(collection(this.firestore, `rooms/${roomId}/strokes`), {
