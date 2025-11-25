@@ -44,9 +44,10 @@ export class FirebaseService {
     return code;
   }
 
-  async createRoom(playerName: string, maxRounds = 5): Promise<string> {
+  async createRoom(playerName: string, maxRounds = 7): Promise<string> {
     const user = await this.authService.signIn();
     const roomCode = await this.generateRoomCode();
+    const safeMaxRounds = Math.min(15, Math.max(1, Math.floor(maxRounds) || 1));
     
     const newRoomRef = doc(collection(this.firestore, 'rooms'));
     
@@ -62,7 +63,7 @@ export class FirebaseService {
       hostId: user.uid,
       status: 'waiting',
       currentRound: 0,
-      maxRounds,
+      maxRounds: safeMaxRounds,
       createdAt: Date.now(),
       players: [hostPlayer],
     };
@@ -324,8 +325,39 @@ export class FirebaseService {
     });
   }
 
-    getWordsToChoose(): string[] {
-        const shuffled = biblicalWords.sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 2);
+  async updateMaxRounds(roomId: string, maxRounds: number) {
+    if (!this.firestore) return;
+    const safeMaxRounds = Math.min(15, Math.max(1, Math.floor(maxRounds) || 1));
+    const roomRef = doc(this.firestore, `rooms/${roomId}`);
+    // setDoc with merge to avoid issues if the doc is missing fields
+    await setDoc(roomRef, { maxRounds: safeMaxRounds }, { merge: true });
+  }
+
+  async getWordsToChoose(roomId?: string): Promise<string[]> {
+    const shuffled = [...biblicalWords].sort(() => 0.5 - Math.random());
+    if (!roomId || !this.firestore) {
+      return shuffled.slice(0, 2);
     }
+
+    try {
+      const roundsSnap = await getDocs(collection(this.firestore, `rooms/${roomId}/rounds`));
+      const used = new Set<string>();
+      roundsSnap.forEach(docSnap => {
+        const word = (docSnap.data().secretWord as string) || '';
+        const norm = this.normalizeString(word);
+        if (norm) used.add(norm);
+      });
+
+      const available = shuffled.filter(w => !used.has(this.normalizeString(w)));
+      if (available.length >= 2) {
+        return available.slice(0, 2);
+      }
+
+      const combined = [...available, ...shuffled].filter((w, idx, arr) => arr.indexOf(w) === idx);
+      return combined.slice(0, 2);
+    } catch (error) {
+      console.error('Erro ao obter palavras já usadas:', error);
+      return shuffled.slice(0, 2);
+    }
+  }
 }

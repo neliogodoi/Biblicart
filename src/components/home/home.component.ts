@@ -15,7 +15,6 @@ export class HomeComponent {
 
   playerName = signal('');
   roomCode = signal('');
-  maxRounds = signal(5);
   isLoading = signal(false);
   showJoinForm = signal(false);
 
@@ -34,7 +33,7 @@ export class HomeComponent {
     if (!this.playerName() || this.isLoading()) return;
     this.isLoading.set(true);
     try {
-      const roomId = await this.firebaseService.createRoom(this.playerName(), this.maxRounds());
+      const roomId = await this.firebaseService.createRoom(this.playerName());
       if (roomId) {
         this.router.navigate(['/room', roomId]);
       } else {

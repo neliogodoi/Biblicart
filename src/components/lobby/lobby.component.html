@@ -4,11 +4,12 @@
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800">Sala de Espera</h1>
         <p class="text-gray-500 mt-2">Convide seus amigos com o código da sala!</p>
+        <p class="text-sm text-gray-500 mt-1">Número de rodadas: {{ room.maxRounds || 7 }}</p>
         <div class="mt-4 inline-flex items-center gap-2 bg-gray-100 rounded-lg p-3 cursor-pointer" (click)="copyCode()">
           <span class="text-4xl font-bold tracking-widest text-[#3A86FF]">{{ room.code }}</span>
            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
+         </svg>
         </div>
       </div>
 
