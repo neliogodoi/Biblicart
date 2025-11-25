@@ -21,6 +21,12 @@ export class HomeComponent implements OnInit {
   showJoinForm = signal(false);
 
   ngOnInit(): void {
+    const initialCode = this.route.snapshot.queryParamMap.get('code');
+    if (initialCode) {
+      this.showJoinForm.set(true);
+      this.roomCode.set(initialCode.toUpperCase());
+    }
+
     this.route.queryParamMap.subscribe(params => {
       const codeParam = params.get('code');
       if (codeParam) {
