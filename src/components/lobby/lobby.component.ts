@@ -49,8 +49,8 @@ export class LobbyComponent {
 	async shareRoom() {
 		const room = this.gameService.room();
 		if (!room) return;
-		const baseUrl = document.baseURI ? new URL(document.baseURI).toString().replace(/\/$/, '') : window.location.origin;
-		const link = `${baseUrl}/?code=${room.code}`;
+		const baseUrl = `${window.location.origin}${window.location.pathname}`.replace(/\/$/, '');
+		const link = `${baseUrl}/#/?code=${room.code}`;
 		const message = `Entre na minha sala do BiblicArt! Código: ${room.code}`;
 		try {
 			if (navigator.share) {
