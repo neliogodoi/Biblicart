@@ -15,6 +15,7 @@ import { FirebaseService } from '../../../services/firebase.service';
 })
 export class ChatComponent {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  @ViewChild('guessInput') private guessInput!: ElementRef<HTMLInputElement>;
 
   gameService = inject(GameService);
   firebaseService = inject(FirebaseService);
@@ -45,6 +46,8 @@ export class ChatComponent {
         playerName: player.name,
     });
     this.guessText.set('');
+    // Remove foco para recolher o teclado em dispositivos móveis
+    setTimeout(() => this.guessInput?.nativeElement?.blur(), 0);
   }
 
   private scrollToBottom(): void {
