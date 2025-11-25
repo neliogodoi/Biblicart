@@ -15,6 +15,15 @@ export class FirebaseService {
   private authService = inject(AuthService);
   private firestore = inject(FIRESTORE);
 
+  private async clearCollection(path: string): Promise<void> {
+    const colRef = collection(this.firestore!, path);
+    const snap = await getDocs(colRef);
+    if (snap.empty) return;
+    const batch = writeBatch(this.firestore!);
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  }
+
   private async generateRoomCode(): Promise<string> {
     if (!this.firestore) throw new Error("Firestore not initialized");
 
@@ -35,7 +44,7 @@ export class FirebaseService {
     return code;
   }
 
-  async createRoom(playerName: string): Promise<string> {
+  async createRoom(playerName: string, maxRounds = 5): Promise<string> {
     const user = await this.authService.signIn();
     const roomCode = await this.generateRoomCode();
     
@@ -53,7 +62,7 @@ export class FirebaseService {
       hostId: user.uid,
       status: 'waiting',
       currentRound: 0,
-      maxRounds: 5,
+      maxRounds,
       createdAt: Date.now(),
       players: [hostPlayer],
     };
@@ -286,6 +295,33 @@ export class FirebaseService {
               }
           });
       }
+  }
+
+  /**
+   * Resets a finished room to waiting state, clearing rounds, strokes and guesses,
+   * and zeroing players' scores so everyone stays in the same room.
+   */
+  async restartGame(roomId: string) {
+    if (!this.firestore) return;
+
+    const roomRef = doc(this.firestore, `rooms/${roomId}`);
+    const roomSnap = await getDoc(roomRef);
+    if (!roomSnap.exists()) throw new Error("Room does not exist");
+
+    const roomData = roomSnap.data() as Room;
+    const resetPlayers = roomData.players.map(p => ({ ...p, score: 0 }));
+
+    await Promise.all([
+      this.clearCollection(`rooms/${roomId}/strokes`),
+      this.clearCollection(`rooms/${roomId}/guesses`),
+      this.clearCollection(`rooms/${roomId}/rounds`),
+    ]);
+
+    await updateDoc(roomRef, {
+      players: resetPlayers,
+      status: 'waiting',
+      currentRound: 0,
+    });
   }
 
     getWordsToChoose(): string[] {

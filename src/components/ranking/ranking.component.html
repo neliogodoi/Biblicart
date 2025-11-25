@@ -23,10 +23,16 @@
       }
     </div>
 
-    <div class="mt-10">
-      <button (click)="goToHome()" class="px-8 py-3 bg-[#2EC4B6] text-white font-bold text-lg rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] transition-transform transform hover:scale-105">
-        Jogar Novamente
+    <div class="mt-10 space-y-2">
+      <button 
+        (click)="restartInSameRoom()" 
+        [disabled]="isRestarting() || !gameService.isHost()" 
+        class="px-8 py-3 bg-[#2EC4B6] text-white font-bold text-lg rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6] transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">
+        @if (isRestarting()) { Reiniciando... } @else { Jogar Novamente }
       </button>
+      @if (!gameService.isHost()) {
+        <p class="text-sm text-gray-500">Somente o host pode reiniciar a sala.</p>
+      }
     </div>
   </div>
 </div>
