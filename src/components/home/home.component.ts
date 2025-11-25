@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@ang
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FirebaseService } from '../../services/firebase.service';
+import { SoundService } from '../../services/sound.service';
 
 @Component({
   standalone: true,
@@ -13,6 +14,7 @@ export class HomeComponent implements OnInit {
   private firebaseService = inject(FirebaseService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private sound = inject(SoundService);
 
   playerName = signal('');
   roomCode = signal('');
@@ -51,6 +53,7 @@ export class HomeComponent implements OnInit {
     if (!this.playerName() || this.isLoading()) return;
     this.isLoading.set(true);
     try {
+      this.sound.play('click');
       const roomId = await this.firebaseService.createRoom(this.playerName(), this.maxRounds());
       if (roomId) {
         this.router.navigate(['/room', roomId]);
@@ -74,6 +77,7 @@ export class HomeComponent implements OnInit {
     if (!this.playerName() || !this.roomCode() || this.isLoading()) return;
     this.isLoading.set(true);
     try {
+      this.sound.play('click');
       const roomId = await this.firebaseService.joinRoom(this.roomCode(), this.playerName());
       if (roomId) {
         this.router.navigate(['/room', roomId]);

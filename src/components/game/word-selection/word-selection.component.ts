@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, OnInit, OnDestroy }
 import { CommonModule } from '@angular/common';
 import { GameService } from '../../../services/game.service';
 import { FirebaseService } from '../../../services/firebase.service';
+import { SoundService } from '../../../services/sound.service';
 
 type IconRule = { keyword: string; icon: string };
 const iconRules: IconRule[] = [
@@ -213,6 +214,7 @@ const iconRules: IconRule[] = [
 export class WordSelectionComponent implements OnInit, OnDestroy {
   gameService = inject(GameService);
   firebaseService = inject(FirebaseService);
+  private sound = inject(SoundService);
   
   words = signal<string[]>([]);
   selectedWord = signal<string | null>(null);
@@ -242,6 +244,7 @@ export class WordSelectionComponent implements OnInit, OnDestroy {
     this.stopCountdown();
     const room = this.gameService.room();
     if (room) {
+        this.sound.play('click');
         this.firebaseService.chooseWord(room.id, room.currentRound, word);
     }
   }
@@ -269,6 +272,7 @@ export class WordSelectionComponent implements OnInit, OnDestroy {
     if (this.selectedWord()) return;
     const room = this.gameService.room();
     if (room) {
+      this.sound.play('alert');
       this.firebaseService.skipWordSelection(room.id);
     }
   }

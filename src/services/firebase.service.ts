@@ -184,7 +184,7 @@ export class FirebaseService {
         transaction.set(messageRef, {
           playerId: 'system',
           playerName: 'Sistema',
-          text: `${drawerName} perdeu a vez por não escolher uma palavra.`,
+          text: `${drawerName}: Perdeu a vez!`,
           isCorrect: false,
           createdAt: Date.now(),
         });
@@ -213,7 +213,7 @@ export class FirebaseService {
       transaction.set(messageRef, {
         playerId: 'system',
         playerName: 'Sistema',
-        text: `${drawerName} perdeu a vez por não escolher uma palavra.`,
+        text: `${drawerName}: Perdeu a vez!`,
         isCorrect: false,
         createdAt: Date.now(),
       });

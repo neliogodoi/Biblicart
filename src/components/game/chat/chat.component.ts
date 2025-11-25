@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GameService } from '../../../services/game.service';
 import { FirebaseService } from '../../../services/firebase.service';
+import { SoundService } from '../../../services/sound.service';
 
 @Component({
   selector: 'app-chat',
@@ -19,13 +20,24 @@ export class ChatComponent {
 
   gameService = inject(GameService);
   firebaseService = inject(FirebaseService);
+  private sound = inject(SoundService);
   
   guessText = signal('');
+  private lastGuessCount = 0;
 
   constructor() {
     effect(() => {
         // Triggered when guesses change
-        this.gameService.guesses();
+        const guesses = this.gameService.guesses();
+        if (guesses.length > this.lastGuessCount) {
+            const latest = guesses[guesses.length - 1];
+            if (latest?.isCorrect) {
+                this.sound.play('success');
+            } else {
+                this.sound.play('click');
+            }
+        }
+        this.lastGuessCount = guesses.length;
         this.scrollToBottom();
     });
   }
@@ -45,6 +57,7 @@ export class ChatComponent {
         playerId: player.id,
         playerName: player.name,
     });
+    this.sound.play('click');
     this.guessText.set('');
     // Remove foco para recolher o teclado em dispositivos móveis
     setTimeout(() => this.guessInput?.nativeElement?.blur(), 0);
