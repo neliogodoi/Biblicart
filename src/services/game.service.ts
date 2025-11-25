@@ -50,7 +50,7 @@ export class GameService {
     this.cleanup();
 
     if (!this.firestore) {
-      console.error("Firestore is not initialized. Check your Firebase config.");
+      console.error("Serviço de dados não inicializado. Verifique a configuração do projeto.");
       this.router.navigate(['/']);
       return;
     }
@@ -69,7 +69,7 @@ export class GameService {
       },
       (error) => {
         console.error("Erro ao escutar o documento da sala:", error);
-        alert("Não foi possível conectar à sala. Verifique suas Regras de Segurança do Firestore. Você será redirecionado para a página inicial.");
+        alert("Não foi possível conectar à sala. Verifique as regras de segurança do banco de dados. Você será redirecionado para a página inicial.");
         this.router.navigate(['/']);
         this.cleanup();
       }

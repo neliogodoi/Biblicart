@@ -25,7 +25,7 @@ export class FirebaseService {
   }
 
   private async generateRoomCode(): Promise<string> {
-    if (!this.firestore) throw new Error("Firestore not initialized");
+    if (!this.firestore) throw new Error("Serviço de dados não inicializado");
 
     let code: string;
     let codeExists = true;
