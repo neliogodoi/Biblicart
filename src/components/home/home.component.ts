@@ -21,11 +21,13 @@ export class HomeComponent implements OnInit {
   showJoinForm = signal(false);
 
   ngOnInit(): void {
-    const codeParam = this.route.snapshot.queryParamMap.get('code');
-    if (codeParam) {
-      this.showJoinForm.set(true);
-      this.roomCode.set(codeParam.toUpperCase());
-    }
+    this.route.queryParamMap.subscribe(params => {
+      const codeParam = params.get('code');
+      if (codeParam) {
+        this.showJoinForm.set(true);
+        this.roomCode.set(codeParam.toUpperCase());
+      }
+    });
   }
 
   private handleRoomActionError(error: any, action: 'criar' | 'entrar'): void {
