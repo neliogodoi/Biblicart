@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FirebaseService } from '../../services/firebase.service';
 
@@ -9,15 +9,24 @@ import { FirebaseService } from '../../services/firebase.service';
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   private firebaseService = inject(FirebaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   playerName = signal('');
   roomCode = signal('');
   maxRounds = signal(7);
   isLoading = signal(false);
   showJoinForm = signal(false);
+
+  ngOnInit(): void {
+    const codeParam = this.route.snapshot.queryParamMap.get('code');
+    if (codeParam) {
+      this.showJoinForm.set(true);
+      this.roomCode.set(codeParam.toUpperCase());
+    }
+  }
 
   private handleRoomActionError(error: any, action: 'criar' | 'entrar'): void {
     console.error(`Error ao ${action} sala:`, error);

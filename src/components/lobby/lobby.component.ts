@@ -46,6 +46,23 @@ export class LobbyComponent {
 		}
 	}
 
+	async shareRoom() {
+		const room = this.gameService.room();
+		if (!room) return;
+		const link = `${window.location.origin}/?code=${room.code}`;
+		const message = `Entre na minha sala do BiblicArt! Código: ${room.code}\n${link}`;
+		try {
+			if (navigator.share) {
+				await navigator.share({ title: 'BiblicArt', text: message, url: link });
+			} else {
+				const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+				window.open(waUrl, '_blank');
+			}
+		} catch (error) {
+			console.error('Falha ao compartilhar sala:', error);
+		}
+	}
+
 	updateRoundsInput(value: number | string) {
 		const parsed = Math.floor(Number(value));
 		const clamped = Math.min(15, Math.max(1, isNaN(parsed) ? 1 : parsed));
