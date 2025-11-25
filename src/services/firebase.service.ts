@@ -176,9 +176,18 @@ export class FirebaseService {
       const currentDrawerId = currentRoundDoc.exists()
         ? currentRoundDoc.data().drawerId
         : players[0].id;
+      const drawerName = players.find(p => p.id === currentDrawerId)?.name || 'Jogador';
 
       if (currentRound >= maxRounds) {
         transaction.update(roomRef, { players, status: 'ended' });
+        const messageRef = doc(collection(this.firestore, `rooms/${roomId}/guesses`));
+        transaction.set(messageRef, {
+          playerId: 'system',
+          playerName: 'Sistema',
+          text: `${drawerName} perdeu a vez por não escolher uma palavra.`,
+          isCorrect: false,
+          createdAt: Date.now(),
+        });
         return;
       }
 
@@ -195,9 +204,18 @@ export class FirebaseService {
       });
 
       transaction.update(roomRef, {
-        players,
-        status: 'word-selection',
-        currentRound: nextRound,
+          players,
+          status: 'word-selection',
+          currentRound: nextRound,
+      });
+
+      const messageRef = doc(collection(this.firestore, `rooms/${roomId}/guesses`));
+      transaction.set(messageRef, {
+        playerId: 'system',
+        playerName: 'Sistema',
+        text: `${drawerName} perdeu a vez por não escolher uma palavra.`,
+        isCorrect: false,
+        createdAt: Date.now(),
       });
     });
   }
