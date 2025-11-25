@@ -17,6 +17,7 @@ export class GameComponent {
   gameService = inject(GameService);
 
   isPlayerListExpanded = signal(true);
+  showPlayersOverlay = signal(false);
 
   get maskedWord(): string {
     const word = this.gameService.round()?.secretWord;

@@ -23,4 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.tsbuildinfo
 
+.angular/cache/21.0.0/app/.tsbuildinfo
