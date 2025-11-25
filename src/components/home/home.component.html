@@ -33,8 +33,23 @@
             (ngModelChange)="roomCode.set($event.toUpperCase())"
             placeholder="Ex: AB12"
             maxlength="4"
-            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF006E] focus:border-transparent"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF006E] focus:border-transparent"
           />
+        </div>
+      }
+      @if (!showJoinForm()) {
+        <div>
+          <label for="rounds" class="block text-sm font-medium text-gray-700">Número de rodadas (1-15)</label>
+          <input
+            id="rounds"
+            type="number"
+            min="1"
+            max="15"
+            [ngModel]="maxRounds()"
+            (ngModelChange)="updateMaxRounds($event)"
+            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent"
+          />
+          <p class="text-xs text-gray-500 mt-1">Define quando o ranking final será exibido.</p>
         </div>
       }
     </div>
