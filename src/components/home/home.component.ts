@@ -19,18 +19,12 @@ export class HomeComponent implements OnInit {
   maxRounds = signal(7);
   isLoading = signal(false);
   showJoinForm = signal(false);
-  private attemptedAutoJoin = false;
 
   ngOnInit(): void {
     const codeParam = this.route.snapshot.queryParamMap.get('code');
     if (codeParam) {
       this.showJoinForm.set(true);
       this.roomCode.set(codeParam.toUpperCase());
-      const savedName = this.getSavedName();
-      if (savedName) {
-        this.playerName.set(savedName);
-        this.autoJoinWithStoredName();
-      }
     }
   }
 
@@ -49,7 +43,6 @@ export class HomeComponent implements OnInit {
     if (!this.playerName() || this.isLoading()) return;
     this.isLoading.set(true);
     try {
-      this.saveName(this.playerName());
       const roomId = await this.firebaseService.createRoom(this.playerName(), this.maxRounds());
       if (roomId) {
         this.router.navigate(['/room', roomId]);
@@ -73,7 +66,6 @@ export class HomeComponent implements OnInit {
     if (!this.playerName() || !this.roomCode() || this.isLoading()) return;
     this.isLoading.set(true);
     try {
-      this.saveName(this.playerName());
       const roomId = await this.firebaseService.joinRoom(this.roomCode(), this.playerName());
       if (roomId) {
         this.router.navigate(['/room', roomId]);
@@ -85,23 +77,4 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  private autoJoinWithStoredName() {
-    if (this.attemptedAutoJoin || !this.playerName() || !this.roomCode()) return;
-    this.attemptedAutoJoin = true;
-    this.joinRoom();
-  }
-
-  private saveName(name: string) {
-    try {
-      localStorage.setItem('biblicart_player_name', name);
-    } catch { /* ignore */ }
-  }
-
-  private getSavedName(): string | null {
-    try {
-      return localStorage.getItem('biblicart_player_name');
-    } catch {
-      return null;
-    }
-  }
 }

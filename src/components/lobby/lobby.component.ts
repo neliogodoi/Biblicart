@@ -50,12 +50,12 @@ export class LobbyComponent {
 		const room = this.gameService.room();
 		if (!room) return;
 		const link = `${window.location.origin}/?code=${room.code}`;
-		const message = `Entre na minha sala do BiblicArt! Código: ${room.code}\n${link}`;
+		const message = `Entre na minha sala do BiblicArt! Código: ${room.code}`;
 		try {
 			if (navigator.share) {
 				await navigator.share({ title: 'BiblicArt', text: message, url: link });
 			} else {
-				const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+				const waUrl = `https://wa.me/?text=${encodeURIComponent(`${message}\n${link}`)}`;
 				window.open(waUrl, '_blank');
 			}
 		} catch (error) {
