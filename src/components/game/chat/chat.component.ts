@@ -25,6 +25,11 @@ export class ChatComponent {
   guessText = signal('');
   private lastGuessCount = 0;
 
+  letterCount(): number {
+    const word = this.gameService.round()?.secretWord || '';
+    return word.replace(/\s+/g, '').length;
+  }
+
   constructor() {
     effect(() => {
         // Triggered when guesses change

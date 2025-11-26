@@ -83,8 +83,14 @@
       <div class="p-3">
         @if(gameService.isDrawer()) {
           <p class="text-xs text-gray-500 text-center">Você está desenhando</p>
+          <p class="text-base font-semibold text-center text-[#3A86FF] truncate">
+            {{ gameService.round()?.secretWord?.toUpperCase() || 'Escolha uma palavra...' }}
+          </p>
         } @else {
           <p class="text-xs text-gray-500 text-center">{{ drawerName }} está desenhando</p>
+          <p class="text-base font-semibold text-center text-[#3A86FF] tracking-widest truncate">
+            {{ maskedWord || '_______' }}
+          </p>
         }
       </div>
       <app-chat class="h-full w-full block" />

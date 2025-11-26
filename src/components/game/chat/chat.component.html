@@ -1,5 +1,10 @@
 <div class="h-full flex flex-col p-4">
-  <h3 class="font-bold text-lg mb-2 flex-shrink-0 text-gray-700">Palpites</h3>
+  <div class="flex items-center justify-between mb-2 flex-shrink-0">
+    <h3 class="font-bold text-lg text-gray-700">Palpites</h3>
+    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+      Letras: {{ letterCount() || '-' }}
+    </span>
+  </div>
   <div #scrollContainer class="flex-grow overflow-y-auto space-y-3 pr-2 chat-messages">
     @for (guess of gameService.guesses(); track guess.id) {
       <div>
