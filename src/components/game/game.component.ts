@@ -5,6 +5,7 @@ import { GameService } from '../../services/game.service';
 import { CanvasComponent } from './canvas/canvas.component';
 import { ChatComponent } from './chat/chat.component';
 import { WordSelectionComponent } from './word-selection/word-selection.component';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-game',
@@ -15,6 +16,7 @@ import { WordSelectionComponent } from './word-selection/word-selection.componen
 })
 export class GameComponent {
   gameService = inject(GameService);
+  themeService = inject(ThemeService);
 
   get maskedWord(): string {
     const word = this.gameService.round()?.secretWord;
