@@ -6,7 +6,7 @@
     </span>
   </div>
 
-  <div #scrollContainer class="flex-1 min-h-[170px] max-h-[170px] overflow-y-auto space-y-3 pr-2 chat-messages">
+  <div #scrollContainer class="flex-1 min-h-[120px] overflow-y-auto space-y-3 pr-2 chat-messages">
     @for (guess of gameService.guesses(); track guess.id) {
       <div>
         @if (guess.isCorrect) {

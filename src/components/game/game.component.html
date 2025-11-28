@@ -1,7 +1,7 @@
 
-<div class="min-h-screen w-full flex justify-center bg-gray-200 py-4 px-2">
-  <div class="w-full max-w-4xl bg-gray-50 border-4 border-gray-300 rounded-[24px] shadow-lg flex flex-col gap-3 p-3">
-    <div class="grid grid-cols-3 items-center bg-white rounded-2xl shadow-sm px-4 py-3">
+<div class="h-screen w-full flex justify-center bg-gray-200 py-2 px-2 overflow-hidden">
+  <div class="h-full w-full max-w-4xl bg-gray-50 rounded-[24px] shadow-lg flex flex-col gap-3 p-3">
+    <div class="grid grid-cols-3 items-center bg-white rounded-2xl shadow px-4 py-3 flex-shrink-0">
       <div class="text-left">
         <p class="text-xs text-gray-500 mb-1">Rodada</p>
         <p class="text-2xl font-extrabold text-gray-800 leading-none">
@@ -31,14 +31,14 @@
       </div>
     </div>
 
-    <div class="flex-1 bg-white rounded-3xl shadow-inner border border-gray-200 p-3 flex flex-col">
-      <div class="relative flex-1 min-h-[360px] rounded-2xl overflow-hidden bg-white">
+    <div class="flex-[2] bg-white rounded-3xl shadow p-3 flex flex-col min-h-[200px] md:min-h-[360px]">
+      <div class="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-inner">
         <app-canvas class="h-full w-full block" />
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-3">
-      <div class="bg-gray-50 rounded-2xl border border-gray-200 h-[340px] px-3 py-2">
+    <div class="bg-white rounded-2xl shadow p-3 flex-1 min-h-0">
+      <div class="bg-gray-50 rounded-2xl h-full px-3 py-2 shadow-inner">
         <app-chat class="h-full w-full block" />
       </div>
     </div>
