@@ -1,120 +1,48 @@
 
-<div class="relative h-screen w-screen bg-gray-100 p-2">
-  <!-- Desktop layout -->
-  <div class="hidden lg:flex flex-row h-full w-full gap-2">
-    <div class="flex-1 flex flex-col gap-2 min-h-0">
-      <div class="p-2 bg-white rounded-xl shadow-sm flex justify-between items-center z-10 flex-shrink-0 min-h-[50px]">
-        <div class="w-20 text-left flex-shrink-0">
-          <span class="text-xs text-gray-400 block mb-0.5">Rodada</span>
-          <span class="font-bold text-lg text-gray-700 leading-none">
-            {{ gameService.room()?.currentRound }}/{{ gameService.room()?.maxRounds }}
-          </span>
-        </div>
-        @if(gameService.isDrawer()) {
-          <div class="text-center overflow-hidden px-2">
-            <span class="text-xs text-gray-400 block mb-0.5">Sua palavra</span>
-            <h2 class="text-xl lg:text-2xl font-bold text-[#3A86FF] tracking-widest leading-none truncate">{{ gameService.round()?.secretWord?.toUpperCase() }}</h2>
-          </div>
-        } @else {
-          <div class="text-center overflow-hidden px-2">
-            <span class="text-xs text-gray-400 block mb-0.5 truncate max-w-[150px] mx-auto">{{ drawerName }} está desenhando</span>
-            <h2 class="text-xl lg:text-2xl font-bold text-[#3A86FF] tracking-widest leading-none truncate">{{ maskedWord }}</h2>
-          </div>
-        }
-        <div class="text-right w-20 flex-shrink-0">
-          <span class="text-xs text-gray-400 block mb-0.5">Pontos</span>
-          <span class="font-bold text-lg text-gray-800 leading-none">{{ gameService.currentPlayer()?.score }}</span>
-        </div>
+<div class="min-h-screen w-full flex justify-center bg-gray-200 py-4 px-2">
+  <div class="w-full max-w-4xl bg-gray-50 border-4 border-gray-300 rounded-[24px] shadow-lg flex flex-col gap-3 p-3">
+    <div class="grid grid-cols-3 items-center bg-white rounded-2xl shadow-sm px-4 py-3">
+      <div class="text-left">
+        <p class="text-xs text-gray-500 mb-1">Rodada</p>
+        <p class="text-2xl font-extrabold text-gray-800 leading-none">
+          {{ gameService.room()?.currentRound }}/{{ gameService.room()?.maxRounds }}
+        </p>
       </div>
-      <div class="flex-grow relative bg-white rounded-xl shadow-sm overflow-hidden">
-        <app-canvas />
+
+      @if(gameService.isDrawer()) {
+        <div class="text-center">
+          <p class="text-xs text-gray-500 mb-1">Você está desenhando...</p>
+          <p class="text-xl font-bold text-emerald-700 tracking-[0.35em] leading-tight uppercase truncate">
+            {{ gameService.round()?.secretWord?.toUpperCase() || 'Escolha uma palavra' }}
+          </p>
+        </div>
+      } @else {
+        <div class="text-center">
+          <p class="text-xs text-gray-500 mb-1 truncate">{{ drawerName }} está desenhando...</p>
+          <p class="text-xl font-bold text-emerald-700 tracking-[0.35em] leading-tight uppercase truncate">
+            {{ maskedWord || '_______' }}
+          </p>
+        </div>
+      }
+
+      <div class="text-right">
+        <p class="text-xs text-gray-500 mb-1">Pontos</p>
+        <p class="text-2xl font-extrabold text-gray-800 leading-none">{{ gameService.currentPlayer()?.score }}</p>
       </div>
     </div>
-    <div class="w-80 flex flex-col gap-2 min-h-0">
-      <div class="bg-white rounded-xl shadow-sm p-3 flex-shrink-0">
-        <div class="flex justify-between items-center cursor-pointer" (click)="isPlayerListExpanded.set(!isPlayerListExpanded())">
-          <h3 class="font-bold text-md text-gray-700">Jogadores</h3>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transition-transform duration-300" [class.rotate-180]="!isPlayerListExpanded()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        @if (isPlayerListExpanded()) {
-          <div class="space-y-1 mt-2 max-h-32 overflow-y-auto">
-            @for (player of gameService.players(); track player.id) {
-              <div class="flex justify-between items-center p-1.5 rounded-lg text-sm" [class.bg-blue-50]="player.id === gameService.round()?.drawerId">
-                <span class="font-semibold text-gray-800 truncate max-w-[120px]">{{ player.name }}</span>
-                <span class="font-bold text-[#FFBE0B] text-xs">{{ player.score }} pts</span>
-              </div>
-            }
-          </div>
-        }
+
+    <div class="flex-1 bg-white rounded-3xl shadow-inner border border-gray-200 p-3 flex flex-col">
+      <div class="relative flex-1 min-h-[360px] rounded-2xl overflow-hidden bg-white">
+        <app-canvas class="h-full w-full block" />
       </div>
-      <div class="bg-white rounded-xl shadow-sm flex-grow flex flex-col min-h-0 overflow-hidden">
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-3">
+      <div class="bg-gray-50 rounded-2xl border border-gray-200 h-[340px] px-3 py-2">
         <app-chat class="h-full w-full block" />
       </div>
     </div>
   </div>
-
-  <!-- Mobile layout -->
-  <div class="flex lg:hidden flex-col h-full w-full gap-2">
-    <div class="p-2 bg-white rounded-xl shadow-sm flex justify-between items-center z-10 flex-shrink-0 min-h-[50px]">
-      <div class="text-left flex-shrink-0">
-        <span class="text-xs text-gray-400 block mb-0.5">Rodada</span>
-        <span class="font-bold text-lg text-gray-700 leading-none">
-          {{ gameService.room()?.currentRound }}/{{ gameService.room()?.maxRounds }}
-        </span>
-      </div>
-      <div class="text-right flex-shrink-0">
-        <span class="text-xs text-gray-400 block mb-0.5">Pontos</span>
-        <span class="font-bold text-lg text-gray-800 leading-none">{{ gameService.currentPlayer()?.score }}</span>
-      </div>
-    </div>
-
-    <div class="relative bg-white rounded-xl shadow-sm overflow-hidden flex-1 min-h-[40vh]">
-      <app-canvas />
-      <button
-        class="absolute top-2 right-2 bg-white/90 text-gray-700 px-3 py-1 rounded-full shadow flex items-center gap-2"
-        (click)="showPlayersOverlay.set(true)">
-        👥 Jogadores
-      </button>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm flex flex-col min-h-[30vh] overflow-hidden">
-      <div class="p-3">
-        @if(gameService.isDrawer()) {
-          <p class="text-xs text-gray-500 text-center">Você está desenhando</p>
-          <p class="text-base font-semibold text-center text-[#3A86FF] truncate">
-            {{ gameService.round()?.secretWord?.toUpperCase() || 'Escolha uma palavra...' }}
-          </p>
-        } @else {
-          <p class="text-xs text-gray-500 text-center">{{ drawerName }} está desenhando</p>
-          <p class="text-base font-semibold text-center text-[#3A86FF] tracking-widest truncate">
-            {{ maskedWord || '_______' }}
-          </p>
-        }
-      </div>
-      <app-chat class="h-full w-full block" />
-    </div>
-  </div>
-
-  @if (showPlayersOverlay()) {
-    <div class="lg:hidden fixed inset-0 bg-black/50 z-50 flex items-end">
-      <div class="bg-white rounded-t-2xl w-full max-h-[70vh] overflow-y-auto p-4">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="font-bold text-md text-gray-700">Jogadores</h3>
-          <button class="text-gray-500" (click)="showPlayersOverlay.set(false)">✕</button>
-        </div>
-        <div class="space-y-2">
-          @for (player of gameService.players(); track player.id) {
-            <div class="flex justify-between items-center p-2 rounded-lg text-sm border" [class.bg-blue-50]="player.id === gameService.round()?.drawerId">
-              <span class="font-semibold text-gray-800 truncate">{{ player.name }}</span>
-              <span class="font-bold text-[#FFBE0B] text-xs">{{ player.score }} pts</span>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  }
 
   <!-- Word Selection Overlay -->
   @if(gameService.room()?.status === 'word-selection' && 

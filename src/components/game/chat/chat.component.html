@@ -1,11 +1,12 @@
-<div class="h-full flex flex-col p-4">
-  <div class="flex items-center justify-between mb-2 flex-shrink-0">
-    <h3 class="font-bold text-lg text-gray-700">Palpites</h3>
-    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-      Letras: {{ letterCount() || '-' }}
+<div class="h-full flex flex-col p-2 md:p-4">
+  <div class="flex items-center justify-between mb-3 flex-shrink-0">
+    <h3 class="font-bold text-base md:text-lg text-gray-700">Palpites...</h3>
+    <span class="text-[11px] md:text-xs text-gray-600 bg-gray-200 px-3 py-1 rounded-full font-semibold">
+      Com {{ letterCount() || '-' }} letras
     </span>
   </div>
-  <div #scrollContainer class="flex-grow overflow-y-auto space-y-3 pr-2 chat-messages">
+
+  <div #scrollContainer class="flex-1 min-h-[170px] max-h-[170px] overflow-y-auto space-y-3 pr-2 chat-messages">
     @for (guess of gameService.guesses(); track guess.id) {
       <div>
         @if (guess.isCorrect) {
@@ -21,23 +22,28 @@
       </div>
     }
   </div>
-  <div class="mt-4 flex-shrink-0">
-    @if (!gameService.isDrawer()) {
-      <form (ngSubmit)="submitGuess()">
-        <input 
-          type="text"
-          placeholder="Digite seu palpite..."
-          [ngModel]="guessText()"
-          (ngModelChange)="guessText.set($event)"
-          [ngModelOptions]="{standalone: true}"
-          #guessInput
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent"
-        />
-      </form>
-    } @else {
-      <div class="text-center p-3 bg-gray-100 rounded-lg text-gray-500">
-        Você é o desenhista!
-      </div>
+
+  <form class="mt-4 flex-shrink-0" (ngSubmit)="submitGuess()">
+    <div class="flex items-center gap-3 bg-white border border-gray-300 rounded-2xl px-3 py-2 shadow-sm">
+      <input 
+        type="text"
+        [placeholder]="gameService.isDrawer() ? 'Você está desenhando...' : 'Digite seu palpite...'"
+        [ngModel]="guessText()"
+        (ngModelChange)="guessText.set($event)"
+        [ngModelOptions]="{standalone: true}"
+        [disabled]="gameService.isDrawer()"
+        #guessInput
+        class="flex-1 px-3 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent bg-gray-50 disabled:bg-gray-100 disabled:text-gray-500"
+      />
+      <button 
+        type="submit"
+        [disabled]="!guessText().trim() || gameService.isDrawer()"
+        class="flex-shrink-0 w-12 h-12 rounded-full bg-gray-800 text-white font-semibold shadow disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors">
+        OK
+      </button>
+    </div>
+    @if(gameService.isDrawer()) {
+      <p class="text-xs text-gray-500 mt-2 text-center">Você é o desenhista — aguarde os palpites.</p>
     }
-  </div>
+  </form>
 </div>
