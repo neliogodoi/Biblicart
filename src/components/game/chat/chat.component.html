@@ -6,7 +6,7 @@
     </span>
   </div>
 
-  <div #scrollContainer class="flex-1 min-h-[120px] overflow-y-auto space-y-3 pr-2 chat-messages pb-24">
+  <div #scrollContainer class="flex-1 min-h-[120px] overflow-y-auto space-y-3 pr-2 chat-messages pb-16">
     @for (guess of gameService.guesses(); track guess.id) {
       <div>
         @if (guess.isCorrect) {
@@ -24,7 +24,7 @@
   </div>
 
   <form class="absolute left-2 right-2 bottom-2 md:left-4 md:right-4 z-10" (ngSubmit)="submitGuess()">
-    <div class="flex items-center gap-3 bg-white border border-gray-300 rounded-2xl px-3 py-2 shadow-lg">
+    <div class="flex items-center gap-2 bg-white rounded-3xl px-3 py-2 shadow-lg">
       <input 
         type="text"
         [placeholder]="gameService.isDrawer() ? 'Você está desenhando...' : 'Digite seu palpite...'"
@@ -33,12 +33,12 @@
         [ngModelOptions]="{standalone: true}"
         [disabled]="gameService.isDrawer()"
         #guessInput
-        class="flex-1 px-3 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent bg-gray-50 disabled:bg-gray-100 disabled:text-gray-500"
+        class="flex-1 min-w-0 px-3 py-2.5 rounded-full focus:outline-none focus:ring-2 focus:ring-[#3A86FF] focus:border-transparent bg-gray-50 disabled:bg-gray-100 disabled:text-gray-500"
       />
       <button 
         type="submit"
         [disabled]="!guessText().trim() || gameService.isDrawer()"
-        class="flex-shrink-0 w-12 h-12 rounded-full bg-gray-800 text-white font-semibold shadow disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors">
+        class="flex-shrink-0 w-11 h-11 rounded-full bg-gray-800 text-white text-sm font-semibold shadow disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors">
         OK
       </button>
     </div>

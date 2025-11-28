@@ -10,14 +10,12 @@
 
     @if(gameService.isDrawer()) {
       <div class="text-center">
-        <p class="text-[11px] text-gray-500 mb-0.5">Você está desenhando...</p>
         <p class="text-lg font-bold text-emerald-700 tracking-[0.15em] leading-snug uppercase break-words whitespace-normal">
           {{ gameService.round()?.secretWord?.toUpperCase() || 'Escolha uma palavra' }}
         </p>
       </div>
     } @else {
       <div class="text-center">
-        <p class="text-[11px] text-gray-500 mb-0.5">{{ drawerName }} está desenhando...</p>
         <p class="text-lg font-bold text-emerald-700 tracking-[0.15em] leading-snug uppercase break-words whitespace-normal">
           {{ maskedWord || '_______' }}
         </p>
